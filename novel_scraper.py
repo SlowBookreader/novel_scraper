@@ -157,8 +157,8 @@ class NovelScraper:
         print(f"EPUB created: {filepath}")
         return filepath
     
-    # Function to scrapte chapters
-    def scapre_and_convert(self, book_name, chapers_per_volume=100):
+    # Function to scrape chapters
+    def scrape_and_convert(self, book_name, chapters_per_volume=100):
         all_chapters = self.get_chapter_list(book_name)
 
         if not all_chapters:
@@ -168,8 +168,8 @@ class NovelScraper:
         volume_number = 1
         created_files = []
 
-        for i in range(0, len(all_chapters), chapers_per_volume):
-            volume_chapters = all_chapters[i:i + chapers_per_volume]
+        for i in range(0, len(all_chapters), chapters_per_volume):
+            volume_chapters = all_chapters[i:i + chapters_per_volume]
             print(f"\nCreating Volume {volume_number} with {len(volume_chapters)} chapters...")
 
             epub_file = self.create_epub(volume_chapters, book_name, volume_number)
@@ -187,27 +187,27 @@ def main():
     book_name = input("Enter the book name (as it appears in the URL): ").strip()
 
     if not book_name:
-        print("Book name cannot be empty!")
+        print("Invalid input, book name cannot be empty!")
         return
     
     try:
-        chapters_input = input("Enters chapters per EPUB file (default: 100): ").strip()
+        chapters_input = input("Enter chapters per EPUB file (default: 100): ").strip()
         chapters_per_volume = int(chapters_input) if chapters_input else 100
     except ValueError:
         chapters_per_volume = 100
-        print("Invalide input, using default of 100 chapters")
+        print("Invalid input, using default of 100 chapters")
 
     try:
         delay_input = input("Enter delay between requests in seconds (default: 1): ").strip()
         delay = float(delay_input) if delay_input else 1.0
     except ValueError:
         delay = 1.0
-        print("Input is invalid, using default 1 second")
+        print("Invalid input, using default 1 second")
 
     scraper = NovelScraper(base_url="https://novelfire.net", delay=delay)
 
     try:
-        scraper.scapre_and_convert(book_name, chapters_per_volume)
+        scraper.scrape_and_convert(book_name, chapters_per_volume)
     except KeyboardInterrupt:
         print("\nProcess interrupted")
     except Exception as e:
