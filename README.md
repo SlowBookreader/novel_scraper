@@ -8,6 +8,7 @@ A python script that scrapes novels from NovelFire, fetches all available chapte
 - Automatically paginates through chapter lists.
 - Extracts clean chapter content (removing scripts/styles).
 - Creates EPUB files, dividing chapters into volumes (configurable).
+- Option to skip volumes when just updating to current published status
 - Adds metadata like titles, chapters, and a table of contents.
 
 ## Requirements
@@ -33,6 +34,7 @@ python novel_scraper.py
 2. Fill out the prompted inputs
     - Book Name – The name from the novel’s URL (e.g., for https://novelfire.net/book/shadow-slave, enter shadow-slave).
     - Chapters per EPUB – (Optional) Number of chapters per EPUB file (default is 100).
+    - Starting chapter – (Optional) EPUB files before starting chapter will be skipped (default is 1).
     - Delay between requests – (Optional) Delay in seconds between HTTP requests (default is 1).
 
 ## Output
@@ -54,6 +56,7 @@ epub_output/
 
 - Support other novel websites.
 - Better error handling and retry logic.
+- Scrape author name
 
 ## License
 
