@@ -158,7 +158,7 @@ class NovelScraper:
         return filepath
     
     # Function to scrapte chapters
-    def scapre_and_convert(self, book_name, chapers_per_volume=100, starting_chapter=1):
+    def scrape_and_convert(self, book_name, chapers_per_volume=100, starting_chapter=1):
         all_chapters = self.get_chapter_list(book_name)
 
         if not all_chapters:
@@ -191,7 +191,7 @@ def main():
     book_name = input("Enter the book name (as it appears in the URL): ").strip()
 
     if not book_name:
-        print("Book name cannot be empty!")
+        print("Invalid input, book name cannot be empty!")
         return
     
     try:
@@ -213,12 +213,12 @@ def main():
         delay = float(delay_input) if delay_input else 1.0
     except ValueError:
         delay = 1.0
-        print("Input is invalid, using default 1 second")
+        print("Invalid input, using default 1 second")
 
     scraper = NovelScraper(base_url="https://novelfire.net", delay=delay)
 
     try:
-        scraper.scapre_and_convert(book_name, chapters_per_volume,starting_chapter)
+        scraper.scrape_and_convert(book_name, chapters_per_volume,starting_chapter)
     except KeyboardInterrupt:
         print("\nProcess interrupted")
     except Exception as e:
