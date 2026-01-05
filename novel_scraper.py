@@ -157,8 +157,8 @@ class NovelScraper:
         print(f"EPUB created: {filepath}")
         return filepath
     
-    # Function to scrape chapters
-    def scrape_and_convert(self, book_name, chapters_per_volume=100):
+    # Function to scrapte chapters
+    def scrape_and_convert(self, book_name, chapers_per_volume=100, starting_chapter=1):
         all_chapters = self.get_chapter_list(book_name)
 
         if not all_chapters:
@@ -168,8 +168,12 @@ class NovelScraper:
         volume_number = 1
         created_files = []
 
-        for i in range(0, len(all_chapters), chapters_per_volume):
-            volume_chapters = all_chapters[i:i + chapters_per_volume]
+        for i in range(0, len(all_chapters), chapers_per_volume):
+            if (starting_chapter - i * chapers_per_volume) > 0:
+                print("Chapter before selected starting chapter, skipping volume creation.")
+                continue
+            
+            volume_chapters = all_chapters[i:i + chapers_per_volume]
             print(f"\nCreating Volume {volume_number} with {len(volume_chapters)} chapters...")
 
             epub_file = self.create_epub(volume_chapters, book_name, volume_number)
@@ -198,6 +202,13 @@ def main():
         print("Invalid input, using default of 100 chapters")
 
     try:
+        starting_chapter_input = input("Enter starting chapter (default: 1): ").strip()
+        starting_chapter = int(starting_chapter_input) if starting_chapter_input else 1
+    except ValueError:
+        starting_chapter = 1
+        print("Invalid input, starting at first chapter")
+        
+    try:
         delay_input = input("Enter delay between requests in seconds (default: 1): ").strip()
         delay = float(delay_input) if delay_input else 1.0
     except ValueError:
@@ -207,7 +218,7 @@ def main():
     scraper = NovelScraper(base_url="https://novelfire.net", delay=delay)
 
     try:
-        scraper.scrape_and_convert(book_name, chapters_per_volume)
+        scraper.scrape_and_convert(book_name, chapters_per_volume,starting_chapter)
     except KeyboardInterrupt:
         print("\nProcess interrupted")
     except Exception as e:
