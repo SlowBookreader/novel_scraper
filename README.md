@@ -4,7 +4,7 @@ A python script that scrapes novels from NovelFire, fetches all available chapte
 
 ## Features
 
-- Fetches all chapters of a novel.
+- Fetches all chapters of a novel (configurable).
 - Automatically paginates through chapter lists.
 - Extracts clean chapter content (removing scripts/styles).
 - Creates EPUB files, dividing chapters into volumes (configurable).
@@ -40,7 +40,7 @@ python novel_scraper.py
 ## Output
 
 The script saves generated .epub files in a folder called epub_output/.
-```sraper-repl
+```scraper-repl
 epub_output/
 ├── shadow-slave-volume-1.epub
 ├── shadow-slave-volume-2.epub
