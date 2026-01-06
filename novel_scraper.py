@@ -92,7 +92,7 @@ class NovelScraper:
             return None
         
     # Creating an EPUB file
-    def create_epub(self, chapters, book_name, volume_number):
+    def create_epub(self, chapters, book_name, volume_number, author='Unknown Author', title_image=None):
         book = epub.EpubBook()
 
         # Book metadata
@@ -100,7 +100,9 @@ class NovelScraper:
         book.set_identifier("{}-vol{}".format(book_name, volume_number))
         book.set_title(book_title)
         book.set_language('en')
-        book.add_author('Unknown Author')
+        book.add_author(author)
+        if title_image: 
+            book.set_cover("cover.jpg", title_image)
 
         epub_chapters = []
 
@@ -146,7 +148,7 @@ class NovelScraper:
         book.add_item(epub.EpubNcx())
         book.add_item(epub.EpubNav())
 
-        book.spine = ['nav'] + epub_chapters
+        book.spine = ['cover','nav'] + epub_chapters
         output_dir = "epub_output"
         os.makedirs(output_dir, exist_ok=True)
 
@@ -157,26 +159,52 @@ class NovelScraper:
         print(f"EPUB created: {filepath}")
         return filepath
     
-    # Function to scrapte chapters
-    def scrape_and_convert(self, book_name, chapers_per_volume=100, starting_chapter=1):
+    # Function to scrape the chapters
+    def scrape_and_convert(self, book_name, chapters_per_volume=100, starting_chapter=1):
         all_chapters = self.get_chapter_list(book_name)
 
         if not all_chapters:
             print("No chapters found!")
             return
-        
+
+        #get Author 
+        author_url="{}/book/{}".format(self.base_url, book_name)
+        try: 
+            response = self.session.get(author_url)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.content, 'html.parser')
+            content_author = soup.find('span', itemprop='author')
+            author = content_author.string
+            print("Author Name added: ",author)
+        except requests.exceptions.HTTPError as e:
+            print("No author name found or HTTP error (", e, "), author will be set to unknown author")
+        except requests.exceptions.RequestException as e:
+            print("A request error occurred:", e, "), author will be set to unknown author")
+            
+        #get Title image 
+        image_url = "{}/server-1/{}.jpg".format(self.base_url, book_name)
+        try: 
+            title_image_response = self.session.get(image_url)
+            title_image_response.raise_for_status()
+            title_image = title_image_response.content
+            print("Title Image found")
+        except requests.exceptions.HTTPError as e:
+            print("No title image found or HTTP error (", e, "), no image will be added to ePUB")
+        except requests.exceptions.RequestException as e:
+            print("A request error occurred:", e, "), no image will be added to ePUB")
+
         volume_number = 1
         created_files = []
 
-        for i in range(0, len(all_chapters), chapers_per_volume):
-            if (starting_chapter - i * chapers_per_volume) > 0:
-                print("Chapter before selected starting chapter, skipping volume creation.")
+        for i in range(0, len(all_chapters), chapters_per_volume):
+            if ((i+1) * chapters_per_volume - starting_chapter) < 0:
+                print("Current chapter block for EPUB volume ending at",(i+1) * chapters_per_volume," before selected starting chapter",starting_chapter,", skipping volume creation.")
                 continue
             
-            volume_chapters = all_chapters[i:i + chapers_per_volume]
+            volume_chapters = all_chapters[i:i + chapters_per_volume]
             print(f"\nCreating Volume {volume_number} with {len(volume_chapters)} chapters...")
 
-            epub_file = self.create_epub(volume_chapters, book_name, volume_number)
+            epub_file = self.create_epub(volume_chapters, book_name, volume_number, author, title_image)
 
             if epub_file:
                 created_files.append(epub_file)
@@ -202,7 +230,7 @@ def main():
         print("Invalid input, using default of 100 chapters")
 
     try:
-        starting_chapter_input = input("Enter starting chapter (default: 1): ").strip()
+        starting_chapter_input = input("Enter starting chapter (default: 1): ").strip() 
         starting_chapter = int(starting_chapter_input) if starting_chapter_input else 1
     except ValueError:
         starting_chapter = 1

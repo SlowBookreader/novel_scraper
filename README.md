@@ -9,7 +9,7 @@ A python script that scrapes novels from NovelFire, fetches all available chapte
 - Extracts clean chapter content (removing scripts/styles).
 - Creates EPUB files, dividing chapters into volumes (configurable).
 - Option to skip volumes when just updating to current published status
-- Adds metadata like titles, chapters, and a table of contents.
+- Adds metadata like titles, chapters, author name, cover and a table of contents.
 
 ## Requirements
 
@@ -56,7 +56,6 @@ epub_output/
 
 - Support other novel websites.
 - Better error handling and retry logic.
-- Scrape author name
 
 ## License
 
