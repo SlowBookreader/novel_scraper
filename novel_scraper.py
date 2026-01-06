@@ -197,8 +197,9 @@ class NovelScraper:
         created_files = []
 
         for i in range(0, len(all_chapters), chapters_per_volume):
-            if ((i+1) * chapters_per_volume - starting_chapter) < 0:
-                print("Current chapter block for EPUB volume ending at",(i+1) * chapters_per_volume," before selected starting chapter",starting_chapter,", skipping volume creation.")
+            if (i+chapters_per_volume - starting_chapter) < 0:
+                print("Current chapter block for EPUB volume ending at",i+chapters_per_volume,"is before selected starting chapter",starting_chapter,", skipping volume creation.")
+                volume_number += 1
                 continue
             
             volume_chapters = all_chapters[i:i + chapters_per_volume]
